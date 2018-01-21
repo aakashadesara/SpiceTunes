@@ -1,0 +1,152 @@
+<head>
+
+	<title>Spice Tunes</title>
+	
+	<link href="https://fonts.googleapis.com/css?family=Gochi+Hand" rel="stylesheet">
+	<link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+	<link rel="stylesheet" type="text/css" href="style.css">
+
+	<script src="https://code.jquery.com/jquery-3.3.0.js" integrity="sha256-TFWSuDJt6kS+huV+vVlyV1jM3dwGdeNWqezhTxXB/X8=" crossorigin="anonymous"></script>
+
+	<script src="https://www.gstatic.com/firebasejs/4.9.0/firebase.js"></script>
+	<script>
+	  // Initialize Firebase
+	  // TODO: Replace with your project's customized code snippet
+	  var config = {
+	    apiKey: "AIzaSyCnadyc_twqSp0Lx_nxQbehGoytLTPykNs",
+	    authDomain: "spicetunes-192804.firebaseapp.com",
+	    databaseURL: "https://spicetunes-192804.firebaseio.com/"
+	  };
+	  firebase.initializeApp(config);
+	</script>
+</head>
+
+
+<script type="text/javascript">
+	    var song_arr = [];
+	    var keys = [];
+
+	window.onload = function() {
+		var song_number = 0;
+
+	    var curr_song;
+	    var counter = 0;
+	    var music_player = $("#player");
+	    var feedback_time = 180000;
+
+
+	    var start_party_loop = setInterval(function() {
+	    	
+	    	if(song_arr.length == 0){
+	    		console.log("Not changing.");
+	    	} else {
+
+	    		
+	    		var next_song = song_arr[song_number];
+	    		console.log("Changing to " + next_song["song"]);
+	    		$("#player").attr("src", "http://www.youtube.com/embed/" + next_song["song"] + "?autoplay=1");
+
+	    		song_number++;
+
+	    		rewriteSongs();
+
+	    	}
+
+	    }, feedback_time);
+
+
+	    $("#submit").click(function() {
+	        var name = $("#textarea").val().replace(/^\s+|\s+$/g, '');
+
+
+	        writeUserData(name);
+
+	        $("#textarea").val("")
+
+	        $("#inputarea").hide();
+
+
+	    });
+
+	    function rewriteSongs(){
+	    	$("#songs").html("");
+	    	for(var i = song_number; i < song_arr.length; i++){
+	        	$("#songs").html($("#songs").html() + "<p>" + song_arr[i]["song"] + "</p>" +
+	                        "<h5>" + song_arr[i]["title"] + "</h5>" + "<img src='" + song_arr[i]["thumbnail"] + "'></img><br>");
+	        }
+	    }
+
+
+
+	    function writeUserData(name_) {
+	        firebase.database().ref('parties/' + name_).set({
+	            name: name_
+	        });
+
+	        $("#party").html(name_.replace(/^\s+|\s+$/g, ''));
+	        var name = $("#party").html();
+
+	        var songlist = firebase.database().ref('parties/' + $("#party").html() + "/");
+	        songlist.on('value', function(snapshot) {
+	            //console.log(snapshot.val());
+	            addSongs(snapshot.val(), name);
+	        });
+
+	    }
+
+	    function addSongs(val, name_) {
+	        $("#songs").html();
+
+	        //console.log(val);
+
+
+	        var temp_count = 0;
+
+	        for (var key in val) {
+	        	temp_count++;
+	            if (val.hasOwnProperty(key)) {
+	                if (val[key].hasOwnProperty("song") && temp_count > song_arr.length) {
+	                    console.log(key + " -> " + val[key]["song"]);
+	                    
+
+	                    song_arr.push({"song" : val[key]["song"], "title" :val[key]["title"], "thumbnail" : val[key]["thumbnail"]});
+
+	                }
+
+
+
+	            }
+	        }
+
+	        rewriteSongs();
+	    }
+
+
+	}
+</script>
+
+<body class="col-md-12" style="width: 100%;">
+
+
+
+	<div id="inputarea" style="position: relative; height: 90%; text-align: center;">
+		<h3 style="margin-top: 1%;"> What are you cooking up today? </h3>
+		<input class="col-md-4" id="textarea"></input>
+
+		<br class="col-md-12">
+
+		<button class="col-md-4 redbutton" style="margin-top: 20px" id="submit"> Create </button>
+
+		<div id="party"></div>
+
+		<img src="images/food2.svg"style="position: absolute; bottom: 0; left: 0; width: 100%;">
+	</div>
+
+	<iFrame style="display: none;" id="player"></iFrame>
+
+	<div id="songs">
+
+	</div>
+
+
+</body>

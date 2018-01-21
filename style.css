@@ -1,0 +1,36 @@
+body {
+	margin: 0px;
+	padding: 0px;
+	font-family: 'Gochi Hand', cursive;
+	text-align: center;
+
+}
+
+.redbutton {
+	height: 50px;
+	background-color: #eb1f26;
+	border-bottom: solid 8px #c42346;
+	border-radius: 10px;
+	color: white;
+	padding: 5px;
+	margin-top: 5px;
+	font-size: 150%;
+}
+
+.redbutton:hover {
+	border-bottom: solid 0px #c42346;
+
+}
+
+input {
+	height: 50px;
+	border: 0px;
+	color: black;
+	background-color: #f4f4f4;
+	border-radius: 10px;
+	padding: 5px;
+	margin-top: 5px;
+	font-size: 150%;
+	outline: none;
+	text-align: center;
+}
